@@ -1,4 +1,4 @@
 package com.knightriders.agenticbanking.models;
 
-public record Question() {
+public record Question(String question) {
 }
