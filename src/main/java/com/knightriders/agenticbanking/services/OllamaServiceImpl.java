@@ -1,39 +1,39 @@
 package com.knightriders.agenticbanking.services;
 
-
+import com.knightriders.agenticbanking.agents.AgentWithTools;
 import com.knightriders.agenticbanking.models.Answer;
 import com.knightriders.agenticbanking.models.Question;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.chat.prompt.PromptTemplate;
+import com.knightriders.agenticbanking.tools.BankingTools;
+import dev.langchain4j.service.AiServices;
+import dev.langchain4j.model.chat.ChatModel;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OllamaServiceImpl implements OllamaService {
 
-    private final ChatModel chatModel;
+    private final AgentWithTools agent;
 
-    public OllamaServiceImpl(ChatModel chatModel) {
-        this.chatModel = chatModel;
+    public OllamaServiceImpl(ChatModel chatModel, BankingTools bankingTools) {
+        this.agent = AiServices.builder(AgentWithTools.class)
+                .chatModel(chatModel)
+                .tools(bankingTools)
+                .build();
     }
 
+    @Override
     public String getAnswer(String question) {
-        PromptTemplate promptTemplate = new PromptTemplate(question);
-        Prompt prompt = promptTemplate.create();
-
-        ChatResponse response = chatModel.call(prompt);
-
-        return response.getResult().getOutput().getText();
+        if (question == null || question.trim().isEmpty()) {
+            throw new IllegalArgumentException("Question cannot be null or empty");
+        }
+        return agent.chat(question);
     }
 
     @Override
     public Answer getAnswer(Question question) {
-        PromptTemplate promptTemplate = new PromptTemplate(question.question());
-        Prompt prompt = promptTemplate.create();
-
-        ChatResponse response = chatModel.call(prompt);
-
-        return new Answer(response.getResult().getOutput().getText());
+        if (question == null || question.question() == null || question.question().trim().isEmpty()) {
+            throw new IllegalArgumentException("Question cannot be null or empty");
+        }
+        String result = agent.chat(question.question());
+        return new Answer(result);
     }
 }

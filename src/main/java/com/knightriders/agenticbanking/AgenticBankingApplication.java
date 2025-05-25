@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+
 @SpringBootApplication
 public class AgenticBankingApplication {
 
@@ -15,7 +16,7 @@ public class AgenticBankingApplication {
     }
 
     @Bean
-    public ToolCallbackProvider bankingTools(BankingTools bankingTools) {
+    public ToolCallbackProvider bankingToolsProvider(BankingTools bankingTools) {
         return MethodToolCallbackProvider.builder().toolObjects(bankingTools).build();
     }
 
