@@ -5,7 +5,7 @@ import com.knightriders.agenticbanking.agents.AgentWithTools;
 import com.knightriders.agenticbanking.models.Answer;
 import com.knightriders.agenticbanking.models.Question;
 import com.knightriders.agenticbanking.tools.BankingTools;
-import dev.langchain4j.model.ollama.OllamaChatModel;
+import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.service.AiServices;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +15,16 @@ public class OllamaServiceImpl implements OllamaService {
     private final AgentWithTools agent;
 
 
-    public OllamaServiceImpl(OllamaChatModel chatModel, BankingTools bankingTools) {
+
+
+
+    public OllamaServiceImpl(OpenAiChatModel chatModel) {
         this.agent = AiServices.builder(AgentWithTools.class)
                 .chatModel(chatModel)
-                .tools(bankingTools)
+                .tools(new BankingTools())
                 .build();
+
+
     }
 
     @Override

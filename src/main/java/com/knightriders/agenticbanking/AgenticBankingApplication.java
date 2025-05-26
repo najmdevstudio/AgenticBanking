@@ -15,9 +15,4 @@ public class AgenticBankingApplication {
         SpringApplication.run(AgenticBankingApplication.class, args);
     }
 
-    @Bean
-    public ToolCallbackProvider bankingToolsProvider(BankingTools bankingTools) {
-        return MethodToolCallbackProvider.builder().toolObjects(bankingTools).build();
-    }
-
 }
