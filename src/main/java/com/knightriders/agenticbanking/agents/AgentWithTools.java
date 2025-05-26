@@ -3,6 +3,11 @@ import dev.langchain4j.service.UserMessage;
 
 public interface AgentWithTools {
 
-    @UserMessage("{{message}}")
-    String chat(String message);
+    @UserMessage("""
+            You are a helpful banking assistant. 
+            You have access to an MCP Server with Several Banking Tools
+            Answer the following question: {{question}}
+            """
+    )
+    String chat(String question);
 }
