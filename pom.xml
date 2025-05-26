@@ -67,6 +67,12 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver-dns-native-macos</artifactId>
+            <version>4.1.119.Final</version>
+            <classifier>osx-aarch_64</classifier> <!-- or arm64 if on Apple Silicon -->
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>

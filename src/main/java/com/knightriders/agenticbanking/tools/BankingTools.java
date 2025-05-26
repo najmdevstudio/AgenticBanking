@@ -1,18 +1,12 @@
 package com.knightriders.agenticbanking.tools;
 
-import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
+import dev.langchain4j.agent.tool.Tool;
 import org.springframework.stereotype.Component;
 
 import org.springframework.web.client.RestClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClientResponseException;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import java.util.Map;
+
 
 @Component
 public class BankingTools {
@@ -38,13 +32,13 @@ public class BankingTools {
                 .build();
     }
 
-    @Tool(description = "Creates a new customer account in the banking system.")
-    public String createAccount(
-            @ToolParam(description = "Name of the account holder", required = true) String name,
-            @ToolParam(description = "Email of the account holder", required = true) String email,
-            @ToolParam(description = "Phone number of the account holder", required = true) String phone,
-            @ToolParam(description = "Type of the account, e.g., SAVINGS or CURRENT", required = true) String accountType,
-            @ToolParam(description = "Initial balance to be deposited", required = true) Double balance) {
+    @Tool
+    public String createNewAccount(
+            String name,
+            String email,
+            String phone,
+            String accountType,
+            Double balance) {
 
         String jsonBody = String.format("""
                 {
@@ -67,10 +61,11 @@ public class BankingTools {
         }
     }
 
-    @Tool(description = "Fetches the account details based on account ID.")
-    public String getAccount(
-            @ToolParam(description = "Unique identifier of the account", required = true) Long id) {
+    @Tool
+    public String getAccountByID(
+             Long id) {
         try {
+            System.out.println(" Tool called for ID: " + id);
             return accountClient.get()
                     .uri("/accounts/" + id)
                     .retrieve()
@@ -80,14 +75,14 @@ public class BankingTools {
         }
     }
 
-    @Tool(description = "Updates an existing customer account.")
+    @Tool
     public String updateAccount(
-            @ToolParam(description = "ID of the account", required = true) Long id,
-            @ToolParam(description = "New name of the account holder", required = false) String name,
-            @ToolParam(description = "New email of the account holder", required = false) String email,
-            @ToolParam(description = "New phone number", required = false) String phone,
-            @ToolParam(description = "Updated account type", required = false) String accountType,
-            @ToolParam(description = "Updated balance", required = false) Double balance) {
+            Long id,
+            String name,
+            String email,
+            String phone,
+            String accountType,
+            Double balance) {
 
         StringBuilder jsonBuilder = new StringBuilder("{");
         boolean first = true;
@@ -127,9 +122,9 @@ public class BankingTools {
         }
     }
 
-    @Tool(description = "Deletes an account from the banking system.")
+    @Tool
     public String deleteAccount(
-            @ToolParam(description = "Account ID to be deleted", required = true) Long id) {
+             Long id) {
         try {
             return accountClient.delete()
                     .uri("/accounts/" + id)
@@ -140,7 +135,7 @@ public class BankingTools {
         }
     }
 
-    @Tool(description = "Retrieves all customer accounts.")
+    @Tool
     public String getAllAccounts() {
         try {
             return accountClient.get()
@@ -152,14 +147,14 @@ public class BankingTools {
         }
     }
 
-    @Tool(description = "Creates a new deposit for a specific account.")
+    @Tool
     public String createDeposit(
-            @ToolParam(description = "Account ID for which the deposit is made", required = true) Long accountId,
-            @ToolParam(description = "Name of the account holder", required = true) String accountName,
-            @ToolParam(description = "Principal amount being deposited", required = true) Float principal,
-            @ToolParam(description = "Rate of interest for the deposit", required = true) Float interestRate,
-            @ToolParam(description = "Maturity date of the deposit (yyyy-MM-dd)", required = true) String maturityDate,
-            @ToolParam(description = "Special conditions or terms", required = false) String condition) {
+             Long accountId,
+             String accountName,
+             Float principal,
+             Float interestRate,
+             String maturityDate,
+             String condition) {
 
         String jsonBody = String.format("""
                 {
@@ -183,7 +178,7 @@ public class BankingTools {
         }
     }
 
-    @Tool(description = "Fetches all deposits made in the bank.")
+    @Tool
     public String getAllDeposits() {
         try {
             return depositClient.get()
@@ -195,9 +190,9 @@ public class BankingTools {
         }
     }
 
-    @Tool(description = "Fetches all deposits made for a specific account.")
+    @Tool
     public String getDepositsByAccountId(
-            @ToolParam(description = "ID of the account", required = true) Long accountId) {
+             Long accountId) {
         try {
             return depositClient.get()
                     .uri("/deposits/account/" + accountId)
@@ -208,13 +203,13 @@ public class BankingTools {
         }
     }
 
-    @Tool(description = "Updates an existing deposit record.")
+    @Tool
     public String updateDeposit(
-            @ToolParam(description = "ID of the deposit to update", required = true) Long depositId,
-            @ToolParam(description = "New principal deposit", required = false) Float principal,
-            @ToolParam(description = "New rate of interest", required = false) Float interestRate,
-            @ToolParam(description = "Updated maturity date (yyyy-MM-dd)", required = false) String maturityDate,
-            @ToolParam(description = "Updated condition", required = false) String condition) {
+             Long depositId,
+             Float principal,
+             Float interestRate,
+             String maturityDate,
+             String condition) {
 
         StringBuilder jsonBuilder = new StringBuilder("{");
         boolean first = true;
@@ -249,9 +244,9 @@ public class BankingTools {
         }
     }
 
-    @Tool(description = "Deletes a deposit record.")
+    @Tool
     public String deleteDeposit(
-            @ToolParam(description = "ID of the deposit to delete", required = true) Long depositId) {
+             Long depositId) {
         try {
             return depositClient.delete()
                     .uri("/deposits/" + depositId)
@@ -262,11 +257,11 @@ public class BankingTools {
         }
     }
 
-    @Tool(description = "Performs a transaction between two accounts.")
+    @Tool
     public String performTransaction(
-            @ToolParam(description = "ID of the account sending the money", required = true) Long fromAccountId,
-            @ToolParam(description = "ID of the account receiving the money", required = true) Long toAccountId,
-            @ToolParam(description = "Amount of money to transfer", required = true) Double amount) {
+             Long fromAccountId,
+             Long toAccountId,
+             Double amount) {
 
         String jsonBody = String.format("""
                 {
@@ -287,7 +282,7 @@ public class BankingTools {
         }
     }
 
-    @Tool(description = "Retrieves all transactions.")
+    @Tool
     public String getAllTransactions() {
         try {
             return transactionClient.get()

@@ -18,10 +18,10 @@ public class OllamaServiceImpl implements OllamaService {
 
 
 
-    public OllamaServiceImpl(OpenAiChatModel chatModel) {
+    public OllamaServiceImpl(OpenAiChatModel chatModel, BankingTools bankingTools) {
         this.agent = AiServices.builder(AgentWithTools.class)
                 .chatModel(chatModel)
-                .tools(new BankingTools())
+                .tools(bankingTools)
                 .build();
 
 
